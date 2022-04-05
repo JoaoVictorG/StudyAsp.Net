@@ -3,10 +3,36 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RazzorPagePizza.Pages
 {
+    using RazorPagesPizza.Models;
+    using RazorPagesPizza.Services;
     public class PizzaModel : PageModel
     {
         public void OnGet()
         {
+            pizzas = PizzaService.GetAll();
+        }
+        public List<Pizza> pizzas = new();
+        public string GlutenFreeText(Pizza pizza)
+        {
+            if (pizza.IsGlutenFree)
+                return "Gluten Free";
+            return "Not Gluten Free";
+        }
+        [BindProperty]
+        public Pizza NewPizza { get; set; } = new();
+        public IActionResult OnPostDelete(int id)
+        {
+            PizzaService.Delete(id);
+            return RedirectToAction("Get");
         }
     }
+}
+public IActionResult OnPost()
+{
+    if (!ModelState.IsValid)
+    {
+        return Page();
+    }
+    PizzaService.Add(NewPizza);
+    return RedirectToAction("Get");
 }
